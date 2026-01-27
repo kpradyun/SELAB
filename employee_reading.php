@@ -68,7 +68,7 @@ function calculateBillAmount($type, $units)
             $amt = (50 * 3.5) + (100 * 4.5) + (50 * 5.5) + (($units - 150) * 6.5);
     }
 
-    return max($amt, $minCharge);
+    return ($units == 0) ? $minCharge : $amt;
 }
 
 function getFineAmount($conn, $serviceNumber, $billStatus)

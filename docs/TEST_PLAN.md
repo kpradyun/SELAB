@@ -5,8 +5,8 @@ This document outlines the test strategy for the refactored Electricity Bill Sys
 
 ## 2. Test Environment
 - **OS**: Linux
-- **Server**: Apache/Nginx (PHP 7.4+)
-- **Database**: MySQL/MariaDB
+- **Server**: Apache
+- **Database**: MySQL
 
 ## 3. Test Cases
 
@@ -25,7 +25,8 @@ This document outlines the test strategy for the refactored Electricity Bill Sys
 | TC-010 | Calculate Bill (HH, 50u) | Units: 50, Type: HOUSEHOLD | Amount: 75.00 (50*1.5) | | Pending |
 | TC-011 | Calculate Bill (HH, 120u) | Units: 120, Type: HOUSEHOLD | Amount: 395.00 (50*1.5 + 50*2.5 + 20*3.5) | | Pending |
 | TC-012 | Calculate Bill (Com, 60u) | Units: 60, Type: COMMERCIAL | Amount: 160.00 (50*2.5 + 10*3.5) | | Pending |
-| TC-013 | Calculate Bill (Ind, Min) | Units: 5, Type: INDUSTRY | Amount: 100.00 (Min Charge) | | Pending |
+| TC-013 | Calculate Bill (Ind, Min) | Units: 0, Type: INDUSTRY | Amount: 100.00 (Min Charge) | | Pending |
+| TC-014 | Calculate Bill (Ind, low) | Units: 5, Type: INDUSTRY | Amount: 17.50 (5 * 3.5) | | Pending |
 | TC-011 | API Get Bill | URL: `api/get_bill.php?bill_no=1001` | JSON with Status "success" | | Passed |
 | TC-012 | API Invalid | URL: `api/get_bill.php` | JSON with Status "error" | | Pending |
 

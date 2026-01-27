@@ -45,7 +45,8 @@
             ELSE amt = (50 * 3.5) + (100 * 4.5) + (50 * 5.5) + ((units - 150) * 6.5)
         END IF
 
-        RETURN MAX(amt, minCharge)
+        IF units == 0 THEN RETURN minCharge
+        ELSE RETURN amt
     END FUNCTION
     ```
 - **Output**: Float (Total Amount).

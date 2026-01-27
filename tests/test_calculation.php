@@ -34,21 +34,23 @@ function calculateBillAmount($type, $units)
             $amt = (50 * 3.5) + (100 * 4.5) + (50 * 5.5) + (($units - 150) * 6.5);
     }
 
-    return max($amt, $minCharge);
+    return ($units == 0) ? $minCharge : $amt;
 }
 
 $tests = [
+    ['type' => 'HOUSEHOLD', 'units' => 0, 'expected' => 25.00],
+    ['type' => 'HOUSEHOLD', 'units' => 1, 'expected' => 1.50],
     ['type' => 'HOUSEHOLD', 'units' => 50, 'expected' => 75.00],
     ['type' => 'HOUSEHOLD', 'units' => 120, 'expected' => 395.00],
     ['type' => 'COMMERCIAL', 'units' => 60, 'expected' => 160.00],
-    ['type' => 'INDUSTRY', 'units' => 5, 'expected' => 100.00],
+    ['type' => 'INDUSTRY', 'units' => 5, 'expected' => 17.50],
 ];
 
 echo "Running Calculation Tests...\n\n";
 
 foreach ($tests as $t) {
     $result = calculateBillAmount($t['type'], $t['units']);
-    $status = ($result == $t['expected']) ? "PASS" : "FAIL";
+    $status = (abs($result - $t['expected']) < 0.01) ? "PASS" : "FAIL";
     echo sprintf("[%s] %s (%d u): Got %.2f, Expected %.2f\n", $status, $t['type'], $t['units'], $result, $t['expected']);
 }
 ?>
