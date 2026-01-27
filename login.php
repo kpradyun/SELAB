@@ -15,46 +15,54 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-function getLoginInputs()
-{
-    return [
-        'email' => trim($_POST['email'] ?? ''),
-        'password' => $_POST['password'] ?? ''
-    ];
-}
+$error = "";
 
-function attemptsLogin($conn, $email, $password)
-{
-    if (empty($email) || empty($password)) {
-        return "Email and Password are required.";
-    }
-
-    $stmt = $conn->prepare("SELECT id, name, password, role FROM employees WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($row = $result->fetch_assoc()) {
-        if ($password === $row['password']) {
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['user_name'] = $row['name'];
-            $_SESSION['role'] = $row['role'];
-
-            $dashboard = ($row['role'] === 'ADMIN') ? 'admin_dashboard.php' : 'employee_dashboard.php';
-            header("Location: $dashboard");
-            exit();
-        } else {
-            return "Incorrect password.";
-        }
-    } else {
-        return "No account found with this email.";
-    }
-}
-
-$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $inputs = getLoginInputs();
-    $error = attemptsLogin($conn, $inputs['email'], $inputs['password']);
+    
+    if (isset($_POST['email'])) {
+        $email = trim($_POST['email']);
+    } else {
+        $email = '';
+    }
+
+    if (isset($_POST['password'])) {
+        $password = $_POST['password'];
+    } else {
+        $password = '';
+    }
+
+    if ($email == "" || $password == "") {
+        $error = "Email and Password are required.";
+    } else {
+        $stmt = $conn->prepare("SELECT id, name, password, role FROM employees WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if ($password === $row['password']) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['user_name'] = $row['name'];
+                $_SESSION['role'] = $row['role'];
+
+                // Redirect
+                if ($row['role'] === 'ADMIN') {
+                    header("Location: admin_dashboard.php");
+                } else {
+                    header("Location: employee_dashboard.php");
+                }
+                exit();
+            } else {
+                $error = "Incorrect password.";
+            }
+        } else {
+            $error = "No account found with this email.";
+        }
+    }
 }
 
 $pageTitle = "Login - TGSPDCL";
@@ -66,14 +74,16 @@ require 'includes/header.php';
 
     <form action="" method="POST">
         <input type="email" name="email" placeholder="Email Address" required
-            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+            value="<?php if (isset($_POST['email'])) {
+                echo htmlspecialchars($_POST['email']);
+            } ?>">
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit" class="btn btn-block">Sign In</button>
     </form>
 
-    <?php if ($error): ?>
-        <p class="error-msg"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+    <?php if ($error != "") { ?>
+        <p class="error-msg"><?php echo htmlspecialchars($error); ?></p>
+    <?php } ?>
 
     <div class="text-center" style="margin-top: 20px;">
         <a href="index.html" style="color:var(--secondary); text-decoration:none;">&larr; Back to Home</a>

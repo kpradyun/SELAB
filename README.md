@@ -14,7 +14,7 @@ The system is divided into three distinct modules based on user roles:
 
 ### 1. Administrator Module
 The Administrator acts as the manager of the system, handling the onboarding of service connections, staff management, and payment status updates.
-* **User Registration:** Registers new service connections with differentiated Service Numbers (Household, Commercial, or Industrial). Captures essential details including Name, Initial Current Reading, and Address.
+* **User Registration:** Registers new service connections with differentiated Service Numbers (Household starts with '1', Commercial with '2', Industrial with '3'). Captures essential details including Name, Initial Current Reading, and Address.
 * **Account Shell Creation:** Establishes the initial profile skeleton that allows users to claim their account via their Service Number.
 * **Employee Management:** Capabilities to register and view employee records.
 * **Payment Status Management:** Manually updates bill status (Paid/Unpaid) for consumers.
@@ -38,7 +38,7 @@ This module allows consumers to monitor their electricity usage and billing hist
 ## Technical Specifications
 
 * **Frontend:** HTML5, CSS3 (Custom styling for thermal receipt replication)
-* **Backend:** PHP (Session management, business logic, role validation)
+* **Backend:** PHP (Simple procedural logic, easy to understand for beginners)
 * **Database:** MySQL (Relational schema linking Users to Monthly Bills)
 * **Server Environment:** Apache HTTP Server (via WAMP/XAMPP)
 
@@ -53,15 +53,15 @@ This module allows consumers to monitor their electricity usage and billing hist
 
 **Administrator Files**
 * `admin_dashboard.php` - Central control panel for admins.
-* `register_user.php` / `register_user_form.php` - Scripts for onboarding new customers.
-* `register_employee.php` / `register_employee_form.php` - Scripts for onboarding staff.
+* `register_user_form.php` - Scripts for onboarding new customers.
+* `register_employee.php` - Scripts for onboarding staff.
 * `view_users.php` - List of all registered consumers.
 * `view_employees.php` - List of all registered staff.
 * `view_bills.php` - Interface for admin to view consumer bills.
 
 **Employee Files**
-* `employee_dashboard.php` - Dashboard for field agents.
-* `employee_reading.php` / `employee_reading_form.php` - Interface for recording meter readings.
+* `employee_dashboard.php` - Dashboard for field agents (includes Meter Reading Form).
+* `employee_reading.php` - Logic for processing meter readings and generating bills.
 
 **Consumer Files**
 * `user_view.php` - Customer dashboard.

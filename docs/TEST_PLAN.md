@@ -29,6 +29,8 @@ This document outlines the test strategy for the refactored Electricity Bill Sys
 | TC-014 | Calculate Bill (Ind, low) | Units: 5, Type: INDUSTRY | Amount: 17.50 (5 * 3.5) | | Pending |
 | TC-011 | API Get Bill | URL: `api/get_bill.php?bill_no=1001` | JSON with Status "success" | | Passed |
 | TC-012 | API Invalid | URL: `api/get_bill.php` | JSON with Status "error" | | Pending |
+| TC-015 | Service Num Format | Register Household User | Service Number starts with '1' and is 10 digits | | Passed |
+| TC-016 | Duplicate Phone | Register with existing phone | Error: "Phone number already exists" | | Passed |
 
 ## 4. Test Report Template
 

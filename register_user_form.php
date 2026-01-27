@@ -6,15 +6,51 @@ checkAuth('ADMIN');
 
 function getUserInputs()
 {
-    return [
-        'name' => trim($_POST['name'] ?? ''),
-        'email' => trim($_POST['email'] ?? ''),
-        'phone' => trim($_POST['phone'] ?? ''),
-        'address' => trim($_POST['address'] ?? ''),
-        'pincode' => trim($_POST['pincode'] ?? ''),
-        'connection_type' => $_POST['connection_type'] ?? '',
-        'current_reading' => $_POST['current_reading'] ?? ''
-    ];
+    $inputs = [];
+    
+    if (isset($_POST['name'])) {
+        $inputs['name'] = trim($_POST['name']);
+    } else {
+        $inputs['name'] = '';
+    }
+
+    if (isset($_POST['email'])) {
+        $inputs['email'] = trim($_POST['email']);
+    } else {
+        $inputs['email'] = '';
+    }
+
+    if (isset($_POST['phone'])) {
+        $inputs['phone'] = trim($_POST['phone']);
+    } else {
+        $inputs['phone'] = '';
+    }
+
+    if (isset($_POST['address'])) {
+        $inputs['address'] = trim($_POST['address']);
+    } else {
+        $inputs['address'] = '';
+    }
+
+    if (isset($_POST['pincode'])) {
+        $inputs['pincode'] = trim($_POST['pincode']);
+    } else {
+        $inputs['pincode'] = '';
+    }
+
+    if (isset($_POST['connection_type'])) {
+        $inputs['connection_type'] = $_POST['connection_type'];
+    } else {
+        $inputs['connection_type'] = '';
+    }
+
+    if (isset($_POST['current_reading'])) {
+        $inputs['current_reading'] = $_POST['current_reading'];
+    } else {
+        $inputs['current_reading'] = '';
+    }
+
+    return $inputs;
 }
 
 function validateUser($inputs)
@@ -38,8 +74,39 @@ function registerUser($conn, $inputs)
 {
     $name = ucwords(strtolower($inputs['name']));
 
-    $prefix = ($inputs['connection_type'] == "HOUSEHOLD") ? "HH" : (($inputs['connection_type'] == "COMMERCIAL") ? "COM" : "IND");
-    $service_number = $prefix . strtoupper(rand(10000, 99999));
+    $checkPhone = $conn->prepare("SELECT id FROM users WHERE phone = ?");
+    $checkPhone->bind_param("s", $inputs['phone']);
+    $checkPhone->execute();
+    $result = $checkPhone->get_result();
+    if ($result->num_rows > 0) {
+        return ['type' => 'error', 'msg' => "Phone number already exists. Please use a different number."];
+    }
+
+    $service_number = "";
+    $isUnique = false;
+
+    while (!$isUnique) {
+        $prefix = "";
+        if ($inputs['connection_type'] == "HOUSEHOLD") {
+            $prefix = "1";
+        } elseif ($inputs['connection_type'] == "COMMERCIAL") {
+            $prefix = "2";
+        } else { // INDUSTRY
+            $prefix = "3";
+        }
+
+        $randomPart = rand(100000000, 999999999);
+        $service_number = $prefix . $randomPart;
+
+        $checkSn = $conn->prepare("SELECT id FROM users WHERE service_number = ?");
+        $checkSn->bind_param("s", $service_number);
+        $checkSn->execute();
+        $snResult = $checkSn->get_result();
+
+        if ($snResult->num_rows == 0) {
+            $isUnique = true;
+        }
+    }
 
     $stmt = $conn->prepare("INSERT INTO users (service_number, name, email, phone, address, pincode, connection_type, previous_reading, registration_date, bill_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, 'UNPAID')");
     $stmt->bind_param("sssssssd", $service_number, $name, $inputs['email'], $inputs['phone'], $inputs['address'], $inputs['pincode'], $inputs['connection_type'], $inputs['current_reading']);
@@ -85,25 +152,43 @@ require 'includes/header.php';
 
     <form method="POST">
         <input type="text" name="name" placeholder="Full Name" required
-            value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
+            value="<?php if (isset($_POST['name'])) {
+                echo htmlspecialchars($_POST['name']);
+            } ?>">
         <input type="email" name="email" placeholder="Email" required
-            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
+            value="<?php if (isset($_POST['email'])) {
+                echo htmlspecialchars($_POST['email']);
+            } ?>">
         <input type="text" name="phone" placeholder="Phone (10 digits)" pattern="[0-9]{10}" required
-            value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
+            value="<?php if (isset($_POST['phone'])) {
+                echo htmlspecialchars($_POST['phone']);
+            } ?>">
         <input type="text" name="address" placeholder="Address" required
-            value="<?= htmlspecialchars($_POST['address'] ?? '') ?>">
+            value="<?php if (isset($_POST['address'])) {
+                echo htmlspecialchars($_POST['address']);
+            } ?>">
         <input type="text" name="pincode" placeholder="Pincode (6 digits)" pattern="[0-9]{6}" required
-            value="<?= htmlspecialchars($_POST['pincode'] ?? '') ?>">
+            value="<?php if (isset($_POST['pincode'])) {
+                echo htmlspecialchars($_POST['pincode']);
+            } ?>">
         <select name="connection_type" required>
-            <option value="HOUSEHOLD" <?= (($_POST['connection_type'] ?? '') == 'HOUSEHOLD') ? 'selected' : '' ?>>
+            <option value="HOUSEHOLD" <?php if (isset($_POST['connection_type']) && $_POST['connection_type'] == 'HOUSEHOLD') {
+                echo 'selected';
+            } ?>>
                 Household</option>
-            <option value="COMMERCIAL" <?= (($_POST['connection_type'] ?? '') == 'COMMERCIAL') ? 'selected' : '' ?>>
+            <option value="COMMERCIAL" <?php if (isset($_POST['connection_type']) && $_POST['connection_type'] == 'COMMERCIAL') {
+                echo 'selected';
+            } ?>>
                 Commercial</option>
-            <option value="INDUSTRY" <?= (($_POST['connection_type'] ?? '') == 'INDUSTRY') ? 'selected' : '' ?>>
+            <option value="INDUSTRY" <?php if (isset($_POST['connection_type']) && $_POST['connection_type'] == 'INDUSTRY') {
+                echo 'selected';
+            } ?>>
                 Industry</option>
         </select>
         <input type="number" name="current_reading" placeholder="Initial Reading" min="0" required
-            value="<?= htmlspecialchars($_POST['current_reading'] ?? '') ?>">
+            value="<?php if (isset($_POST['current_reading'])) {
+                echo htmlspecialchars($_POST['current_reading']);
+            } ?>">
         <button type="submit">Add User</button>
     </form>
 
