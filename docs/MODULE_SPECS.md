@@ -65,17 +65,4 @@
     5.  Return JSON.
 - **Output**: JSON Object.
 
-## Diagram (Mermaid)
-
-```mermaid
-graph TD
-    User-->|Login Credentials|AuthModule
-    AuthModule-->|Success|Dashboard
-    AuthModule-->|Fail|ErrorMsg
-    
-    Dashboard-->|Enter Reading|BillModule
-    BillModule-->|Calculate|DB[(Database)]
-    
-    ExternalApp-->|GET request|APIModule
-    APIModule-->|JSON|ExternalApp
-```
+![System Flow Diagram](system_flow.drawio)
