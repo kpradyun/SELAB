@@ -1,5 +1,6 @@
 # Electricity Bill Generator & Management System
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## Project Overview
 
 The Electricity Bill Generator is a full-stack web application designed to digitize the billing cycle for electricity distribution companies. This system replicates the official TSSPDCL experience, replacing manual paper-based processes with a centralized digital database.
